@@ -9,9 +9,10 @@ export function supabasePublic(): SupabaseClient {
   if (client) return client;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const cle = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  // Nom créé par l'intégration Supabase de Vercel ; l'ancien nom reste accepté.
+  const cle = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !cle) {
-    throw new Error("NEXT_PUBLIC_SUPABASE_URL ou NEXT_PUBLIC_SUPABASE_ANON_KEY manquante (voir .env.example)");
+    throw new Error("NEXT_PUBLIC_SUPABASE_URL ou NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY manquante (voir .env.example)");
   }
 
   client = createClient(url, cle, { auth: { persistSession: false, autoRefreshToken: false } });

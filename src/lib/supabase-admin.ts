@@ -10,9 +10,10 @@ export function supabaseAdmin(): SupabaseClient {
   if (client) return client;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const cle = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // Nom créé par l'intégration Supabase de Vercel ; l'ancien nom reste accepté.
+  const cle = process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !cle) {
-    throw new Error("NEXT_PUBLIC_SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY manquante (voir .env.example)");
+    throw new Error("NEXT_PUBLIC_SUPABASE_URL ou SUPABASE_SECRET_KEY manquante (voir .env.example)");
   }
 
   client = createClient(url, cle, { auth: { persistSession: false, autoRefreshToken: false } });
