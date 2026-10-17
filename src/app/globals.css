@@ -1,0 +1,114 @@
+:root {
+  --vert: #0a7a3d;
+  --vert-fonce: #075c2e;
+  --jaune: #fcd116;
+  --rouge: #ce1126;
+  --texte: #1b1f23;
+  --gris: #f4f5f7;
+  --bordure: #e2e5e9;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--texte);
+  background: #fff;
+  line-height: 1.5;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.conteneur { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+
+.entete { border-bottom: 1px solid var(--bordure); background: #fff; position: sticky; top: 0; z-index: 10; }
+.entete .conteneur { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+.logo { font-weight: 800; font-size: 1.3rem; color: var(--vert); }
+.logo span { color: var(--rouge); }
+.nav { display: flex; gap: 20px; font-size: 0.95rem; }
+.nav a:hover { color: var(--vert); }
+
+.hero { background: var(--vert); color: #fff; padding: 56px 0; }
+.hero h1 { font-size: 2rem; max-width: 640px; line-height: 1.2; }
+.hero p { margin-top: 12px; max-width: 560px; opacity: 0.92; }
+
+.bouton {
+  display: inline-block; margin-top: 20px; padding: 12px 22px;
+  background: var(--jaune); color: #1b1f23; font-weight: 700;
+  border-radius: 8px; border: none; cursor: pointer; font-size: 1rem;
+}
+.bouton:hover { filter: brightness(0.95); }
+
+.section { padding: 40px 0; }
+.section h2 { font-size: 1.4rem; margin-bottom: 20px; }
+
+.grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; }
+
+.carte { border: 1px solid var(--bordure); border-radius: 12px; overflow: hidden; background: #fff; display: block; }
+.carte:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+.carte .visuel { height: 150px; background: var(--gris); display: flex; align-items: center; justify-content: center; font-size: 2.6rem; }
+.carte .contenu { padding: 14px; }
+.carte h3 { font-size: 1rem; margin-bottom: 6px; }
+.prix { font-weight: 800; color: var(--vert); }
+
+.etiquette { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--gris); margin-bottom: 8px; }
+.etiquette.digital { background: #e3f0ff; color: #0b4a9e; }
+.etiquette.formation { background: #fff1d6; color: #8a5300; }
+.etiquette.physique { background: #e2f5e9; color: #0a6b35; }
+
+.filtres { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 22px; }
+.filtres a { padding: 6px 14px; border: 1px solid var(--bordure); border-radius: 99px; font-size: 0.9rem; }
+.filtres a.actif { background: var(--vert); color: #fff; border-color: var(--vert); }
+
+.detail { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; padding: 40px 0; }
+.detail .grand-visuel { background: var(--gris); border-radius: 12px; height: 340px; display: flex; align-items: center; justify-content: center; font-size: 5rem; }
+.detail h1 { font-size: 1.7rem; margin-bottom: 8px; }
+.detail .prix { font-size: 1.5rem; margin: 12px 0; display: block; }
+.detail ul { margin: 14px 0 0 18px; }
+
+.pied { border-top: 1px solid var(--bordure); padding: 28px 0; margin-top: 40px; font-size: 0.9rem; color: #5a6270; }
+
+.selecteurs { display: flex; align-items: center; gap: 10px; }
+.langues { display: flex; border: 1px solid var(--bordure); border-radius: 8px; overflow: hidden; }
+.langues button { border: none; background: #fff; padding: 5px 10px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+.langues button[aria-pressed="true"] { background: var(--vert); color: #fff; }
+.selecteurs select { border: 1px solid var(--bordure); border-radius: 8px; padding: 5px 8px; font-size: 0.85rem; background: #fff; }
+
+.livraison { margin-top: 14px; font-size: 0.9rem; color: #5a6270; }
+
+.formulaire-achat { margin-top: 20px; display: grid; gap: 12px; max-width: 420px; }
+.formulaire-achat label { display: grid; gap: 4px; font-size: 0.9rem; font-weight: 600; }
+.formulaire-achat input,
+.formulaire-achat select,
+.formulaire-achat textarea { font: inherit; font-weight: 400; padding: 9px 10px; border: 1px solid var(--bordure); border-radius: 8px; background: #fff; }
+.formulaire-achat .bouton { margin-top: 0; }
+.formulaire-achat .bouton:disabled { opacity: 0.6; cursor: wait; }
+.actions-achat { display: flex; align-items: center; gap: 16px; }
+.lien-annuler { background: none; border: none; cursor: pointer; font: inherit; font-size: 0.9rem; color: #5a6270; text-decoration: underline; }
+.erreur-achat { color: var(--rouge); font-size: 0.9rem; }
+
+.retour { max-width: 560px; }
+.retour h1 { font-size: 1.6rem; margin-bottom: 10px; }
+.actions-retour { display: flex; flex-wrap: wrap; gap: 12px; }
+.bouton.secondaire { background: #fff; border: 1px solid var(--bordure); }
+
+.acces { max-width: 720px; }
+.acces h1 { font-size: 1.6rem; margin-bottom: 6px; }
+.note-acces { color: #5a6270; font-size: 0.9rem; margin-bottom: 20px; }
+.carte-acces { border: 1px solid var(--bordure); border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+.carte-acces h2 { font-size: 1.15rem; margin-bottom: 8px; }
+.carte-acces .bouton { margin-top: 6px; }
+.formation h3 { font-size: 1rem; margin: 6px 0 10px; }
+.module { margin-bottom: 14px; }
+.module h4 { font-size: 0.95rem; margin-bottom: 6px; }
+.module ul { list-style: none; display: grid; gap: 10px; }
+.lecon { padding: 10px 12px; background: var(--gris); border-radius: 8px; }
+.contenu-lecon { margin-top: 4px; font-size: 0.9rem; white-space: pre-wrap; }
+.lien-lecon { display: inline-block; margin-top: 6px; color: var(--vert); font-weight: 700; font-size: 0.9rem; }
+
+@media (max-width: 700px) {
+  .entete .conteneur { height: auto; min-height: 60px; flex-wrap: wrap; gap: 6px 12px; padding-top: 8px; padding-bottom: 8px; }
+  .detail { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 1.6rem; }
+  .nav { gap: 12px; font-size: 0.85rem; }
+}
