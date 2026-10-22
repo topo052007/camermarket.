@@ -1,5 +1,7 @@
 # CamerMarket
 
+> Le dossier `goallife/` est un **projet séparé** (application mobile d'objectifs personnels) avec son propre `goallife/CLAUDE.md`. Les règles ci-dessous concernent uniquement la boutique.
+
 Boutique en ligne personnelle (une seule boutique, pas une place de marché) qui vend trois types de produits : physiques, digitaux (téléchargement) et formations (leçons protégées). Propriétaire : débutant en programmation, basé au Cameroun. **Marché limité à l'Afrique**, payé en Mobile Money via CinetPay. Répondre en français, expliquer simplement.
 
 **Pas de comptes clients.** Le client donne son e-mail, son pays et son téléphone/WhatsApp dans le formulaire de paiement. Après le paiement, il reçoit par e-mail un lien d'accès personnel (`/[lang]/acces/<jeton>`) où il télécharge ses produits digitaux et suit sa formation. Seul le propriétaire aura un compte (espace admin).
