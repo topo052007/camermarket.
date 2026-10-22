@@ -21,6 +21,7 @@ export async function exporterDonnees(): Promise<Record<string, unknown>> {
     'evenements_progression',
     'messages_coach',
     'usage_ia',
+    'candidatures',
   ] as const;
   const resultats = await Promise.all(tables.map((table) => supabase.from(table).select('*')));
   const export_: Record<string, unknown> = { exporte_le: new Date().toISOString() };

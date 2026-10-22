@@ -21,8 +21,8 @@ Le nom se change sans toucher au code : variable `APP_NAME` (voir `.env.example`
 |---|---|---|
 | TypeScript strict | `npm run typecheck` | ✅ aucune erreur |
 | Lint (règles Expo) | `npm run lint` | ✅ aucune erreur |
-| Logique métier (plans, progression, fuseaux, récurrences, reprise, offres, rappels, validation) | `npm test` | ✅ 33 tests |
-| Base de données : RLS, isolation entre utilisateurs, limites Premium côté serveur, double validation, report, reprise, quotas IA, suppression de compte | `npm run test:db` | ✅ 61 vérifications sur un PostgreSQL 16 local qui imite Supabase |
+| Logique métier (plans, progression, fuseaux, récurrences, reprise, offres, rappels, validation, modèles, estimation) | `npm test` | ✅ 62 tests |
+| Base de données : RLS, isolation entre utilisateurs, limites Premium côté serveur, double validation, report, reprise, quotas IA, suppression de compte | `npm run test:db` | ✅ 61 + 14 vérifications (dont module candidatures) sur un PostgreSQL 16 local qui imite Supabase |
 | Fonctions serveur (coach IA, suppression de compte, webhook) | `deno check` + `deno test` | ✅ types OK, 6 tests |
 | Bundle Android (Hermes) | `npx expo export --platform android` | ✅ 4,8 Mo |
 | Démarrage réel dans un navigateur : connexion, erreur de mot de passe, validation de l'inscription, confidentialité | Playwright + export web | ✅ (captures ci-dessus) |
@@ -77,6 +77,7 @@ src/app/                  écrans (Expo Router)
   objectifs/nouveau.tsx   formulaire -> plan modifiable -> activation
   objectifs/[id]/         détail, modifier, reprise après retard
   actions/[id].tsx        faire, reporter, ignorer, annuler, modifier, créer
+  candidatures/            suivi des candidatures (liste, formulaire)
   planning, calendrier, historique, parametres, notifications, abonnement, confidentialite, aide
 src/domain/               logique métier PURE et testée (aucun accès réseau)
 src/data/                 accès Supabase (seul endroit qui parle au serveur)
@@ -110,7 +111,8 @@ npx expo start              # scanner le QR code avec le téléphone
 ## 5. Configurer Supabase (à faire par toi)
 
 1. Créer un projet sur supabase.com (région proche : `eu-west` ou `eu-central`).
-2. **SQL Editor** : coller et exécuter `supabase/migrations/20261022000001_schema_initial.sql`.
+2. **SQL Editor** : exécuter, dans l'ordre, les fichiers de `supabase/migrations/`
+   (`20261022000001_schema_initial.sql` puis `20261022000002_modules_metier.sql`).
    (Ou avec la CLI : `npx supabase link` puis `npx supabase db push`.)
 3. **Authentication > URL Configuration** : ajouter `goallife://**` dans *Redirect URLs*
    (et l'adresse `exp://…` affichée par Expo Go pendant les tests).
@@ -205,9 +207,10 @@ des données Google Play, notifications push : clés FCM (Android) et APNs (iOS)
 
 - Pas de connexion Google/Apple/téléphone pour l'instant (l'architecture Supabase Auth le permet).
 - Créer un objectif demande Internet (le reste du suivi quotidien fonctionne hors ligne).
-- Les modules métier (finances, sport, lecture, emploi, spiritualité, maison, habitudes) partagent
-  le même moteur ; seules les catégories, unités et modèles d'étapes sont spécifiques. Les
-  fonctions avancées (budgets, suivi détaillé des candidatures, routines de prière…) restent à faire.
+- Modules métier : 23 modèles d'objectifs, suivi des candidatures et estimation de la date
+  d'atteinte sont en place. Restent à faire : budgets mensuels, rappels de médicaments,
+  rappel automatique de relance des candidatures (aujourd'hui : simple badge « À relancer »),
+  partage familial.
 - Pas de limitation de débit spécifique sur l'inscription/connexion au-delà de celle de Supabase Auth.
 - La version web sert aux tests ; les rappels n'y sont pas disponibles.
 - Export des données : JSON partagé via la feuille de partage du téléphone (pas de fichier).

@@ -124,6 +124,8 @@ function Navigation() {
           <Stack.Screen name="parametres" options={{ title: t('param.titre') }} />
           <Stack.Screen name="notifications" options={{ title: t('notif.titre_ecran') }} />
           <Stack.Screen name="abonnement" options={{ title: t('abo.titre') }} />
+          <Stack.Screen name="candidatures/index" options={{ title: t('cand.titre') }} />
+          <Stack.Screen name="candidatures/[id]" options={{ title: t('cand.nouvelle') }} />
         </Stack.Protected>
         <Stack.Screen name="confidentialite" options={{ title: t('conf.titre') }} />
         <Stack.Screen name="aide" options={{ title: t('aide.titre') }} />

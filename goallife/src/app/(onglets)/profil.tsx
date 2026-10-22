@@ -37,6 +37,7 @@ export default function Profil() {
         <LigneLien icone="notifications-outline" titre={t('profil.notifications')} onPress={() => router.push('/notifications')} />
         <LigneLien icone="star-outline" titre={t('profil.abonnement')} onPress={() => router.push('/abonnement')} />
         <LigneLien icone="shield-checkmark-outline" titre={t('profil.confidentialite')} onPress={() => router.push('/confidentialite')} />
+        <LigneLien icone="briefcase-outline" titre={t('cand.titre')} onPress={() => router.push('/candidatures')} />
         <LigneLien icone="time-outline" titre={t('hist.titre')} onPress={() => router.push('/historique')} />
         <LigneLien icone="help-circle-outline" titre={t('profil.aide')} onPress={() => router.push('/aide')} />
         <LigneLien icone="log-out-outline" titre={t('profil.deconnexion')} onPress={deconnecter} />

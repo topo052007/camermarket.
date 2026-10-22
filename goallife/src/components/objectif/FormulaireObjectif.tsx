@@ -32,7 +32,7 @@ export type BrouillonObjectif = {
   rappelHeure: string;
 };
 
-const DUREES = [7, 14, 30, 60, 90, 180];
+export const DUREES = [7, 14, 30, 60, 90, 180];
 export const DUREE_PERSO = -1;
 
 export function FormulaireObjectif({

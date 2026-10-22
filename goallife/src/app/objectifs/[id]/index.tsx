@@ -17,7 +17,9 @@ import { cles } from '@/data/cles';
 import { cleErreur } from '@/data/erreurs';
 import { ajouterContribution, changerStatutObjectif, cocherEtape, supprimerContribution, supprimerObjectif } from '@/data/objectifs';
 import { ajouterJours, ecartJours } from '@/domain/dates';
+import { prevoirAtteinte } from '@/domain/prevision';
 import { calculerProgression, effortRestantParJour } from '@/domain/progression';
+import { ResumePrevision } from '@/components/objectif/Prevision';
 import { analyserRetard } from '@/domain/reprise';
 import type { StatutObjectif } from '@/domain/types';
 import { useObjectif } from '@/hooks/donnees';
@@ -148,6 +150,12 @@ export default function DetailObjectif() {
             <Texte variante="petit">{t('det.reste', { reste: quantite(progression.reste, o.unite) })}</Texte>
           )}
           {effort && <Texte variante="petit">{t('det.effort_restant', { quantite: quantite(effort.parJour, o.unite), nombre: effort.joursRestants })}</Texte>}
+          {o.type === 'quantitatif' && o.valeur_cible != null && o.statut === 'actif' && (
+            <ResumePrevision
+              prevision={prevoirAtteinte({ ...o, valeur_cible: o.valeur_cible }, o.evenements_progression, jour)}
+              unite={o.unite}
+            />
+          )}
           {progression.mode === 'quantite' && progression.reste === 0 && o.statut === 'actif' && (
             <Encart ton="succes">
               <Texte couleur={couleurs.succes}>{t('det.objectif_atteint')}</Texte>
@@ -156,6 +164,10 @@ export default function DetailObjectif() {
           )}
         </Carte>
       </Section>
+
+      {(o.categorie === 'carriere' || o.unite === 'candidatures') && (
+        <Bouton titre={t('cand.voir')} variante="secondaire" onPress={() => router.push(`/candidatures?objectif=${o.id}`)} />
+      )}
 
       {o.type === 'quantitatif' && (
         <Section titre={t('det.contributions')}>
@@ -179,7 +191,7 @@ export default function DetailObjectif() {
                 <Texte style={{ flex: 1 }}>
                   +{quantite(e.valeur ?? 0, o.unite)} · {date(e.date_evenement)}
                 </Texte>
-                {e.action_id == null && (
+                {e.action_id == null && e.candidature_id == null && (
                   <Pressable
                     accessibilityRole="button"
                     accessibilityLabel={t('commun.supprimer')}

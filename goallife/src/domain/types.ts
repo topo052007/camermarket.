@@ -17,7 +17,7 @@ export type CodeCategorie = (typeof CATEGORIES)[number];
 // Catégories dont le contenu ne doit pas apparaître sur l'écran verrouillé par défaut.
 export const CATEGORIES_SENSIBLES: readonly CodeCategorie[] = ['spiritualite', 'sante'];
 
-export const UNITES = ['argent', 'pages', 'minutes', 'seances', 'candidatures', 'chapitres', 'fois'] as const;
+export const UNITES = ['argent', 'pages', 'minutes', 'heures', 'seances', 'candidatures', 'chapitres', 'verres', 'fois'] as const;
 export type Unite = (typeof UNITES)[number];
 
 export type TypeObjectif = 'quantitatif' | 'recurrent' | 'echeance';
@@ -96,6 +96,7 @@ export type EvenementProgression = {
   id: string;
   objectif_id: string;
   action_id: string | null;
+  candidature_id: string | null;
   type: 'contribution' | 'jalon_atteint' | 'plan_ajuste' | 'reprise';
   valeur: number | null;
   note: string | null;
@@ -132,4 +133,22 @@ export type Abonnement = {
   statut: 'actif' | 'essai' | 'expire' | 'annule';
   plateforme: 'aucune' | 'google_play' | 'app_store' | 'manuel';
   expire_le: string | null;
+};
+
+export const STATUTS_CANDIDATURE = ['a_envoyer', 'envoyee', 'entretien', 'offre', 'refusee', 'abandonnee'] as const;
+export type StatutCandidature = (typeof STATUTS_CANDIDATURE)[number];
+
+export type Candidature = {
+  id: string;
+  user_id: string;
+  objectif_id: string | null;
+  entreprise: string;
+  poste: string | null;
+  statut: StatutCandidature;
+  envoyee_le: DateLocale | null;
+  relance_le: DateLocale | null;
+  lien: string | null;
+  notes: string | null;
+  cree_le: string;
+  modifie_le: string;
 };

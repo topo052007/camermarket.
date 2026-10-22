@@ -9,6 +9,8 @@ export const cles = {
   actionsPeriode: (debut: string, fin: string) => ['actions', debut, fin] as const,
   action: (id: string) => ['action', id] as const,
   historique: ['historique'] as const,
+  candidatures: ['candidatures'] as const,
+  candidature: (id: string) => ['candidature', id] as const,
   coachStatut: ['coach', 'statut'] as const,
   messagesCoach: ['coach', 'messages'] as const,
 };

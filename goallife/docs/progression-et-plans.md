@@ -68,3 +68,25 @@ Toutes les règles ci-dessous sont implémentées dans `src/domain/` (fonctions 
   - **Repousser l'échéance** de 14 jours ;
   - **Recalculer le rythme** : ce qui reste est réparti sur les séances restantes.
 - Dans tous les cas, les actions manquées passent « ignorées » (raison : reprise).
+
+## Estimation de la date d'atteinte — `src/domain/prevision.ts`
+
+Pour un objectif chiffré actif :
+- rythme = somme des contributions des 14 derniers jours / 14 (ou / nombre de jours depuis le
+  début si l'objectif a moins de 14 jours) ;
+- date estimée = aujourd'hui + ⌈reste / rythme⌉, comparée à l'échéance (avance ou retard en jours) ;
+- aucune estimation avant 3 jours ou sans contribution récente (« pas encore assez de données ») ;
+- toujours affichée comme une **estimation**, jamais comme une promesse.
+
+## Modules métier
+
+- **Modèles d'objectifs** (`src/domain/modeles.ts`) : 23 exemples par domaine (épargne, sport,
+  hydratation, sommeil, lecture, langue, examen, candidatures, emploi, activité, ventes, routines,
+  maison, famille, gratitude, spiritualité). Un modèle pré-remplit seulement le formulaire.
+  Les modèles spirituels (chrétiens et musulmans, côte à côte) n'apparaissent que si le module
+  spiritualité est activé. Chaque modèle est testé : il doit produire un plan valide.
+- **Candidatures** (table `candidatures`, privée) : entreprise, poste, statut (à envoyer, envoyée,
+  entretien, offre, refusée, abandonnée), relance, lien, notes. Une candidature liée à un objectif
+  chiffré en « candidatures » compte **+1 automatiquement** dès qu'elle est envoyée (une seule fois,
+  retirée si elle revient « à envoyer ») — trigger `synchroniser_contribution_candidature`.
+- Nouvelles unités : `verres` (hydratation) et `heures` (sommeil, étude).

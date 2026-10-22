@@ -6,7 +6,8 @@ import { Bouton } from '@/components/Bouton';
 import { Ecran } from '@/components/Ecran';
 import { Encart } from '@/components/Etats';
 import { EditeurPlan } from '@/components/objectif/EditeurPlan';
-import { DUREE_PERSO, FormulaireObjectif, type BrouillonObjectif } from '@/components/objectif/FormulaireObjectif';
+import { ChoixModele } from '@/components/objectif/ChoixModele';
+import { DUREE_PERSO, DUREES, FormulaireObjectif, type BrouillonObjectif } from '@/components/objectif/FormulaireObjectif';
 import { Texte } from '@/components/Texte';
 import { HORIZON_JOURS } from '@/config/env';
 import { cles } from '@/data/cles';
@@ -14,6 +15,7 @@ import { demanderPlanIa, statutCoach } from '@/data/coach';
 import { cleErreur } from '@/data/erreurs';
 import { creerObjectifAvecPlan } from '@/data/objectifs';
 import { ajouterJours } from '@/domain/dates';
+import { cleTitreModele, type ModeleObjectif } from '@/domain/modeles';
 import { peutCreerObjectif, LIMITES } from '@/domain/offres';
 import { genererPlan, type PlanPropose } from '@/domain/plan';
 import { joursParDefaut } from '@/domain/recurrence';
@@ -48,6 +50,7 @@ export default function NouvelObjectif() {
     rappelActif: false,
     rappelHeure: '19:00',
   });
+  const [afficherModeles, setAfficherModeles] = useState(true);
   const [erreurs, setErreurs] = useState<Record<string, string>>({});
   const [saisie, setSaisie] = useState<SaisieObjectif | null>(null);
   const [planRegles, setPlanRegles] = useState<PlanPropose | null>(null);
@@ -67,6 +70,27 @@ export default function NouvelObjectif() {
       if (b.type === 'echeance') b = { ...b, jours: joursParDefaut(2), unite: null };
     }
     setBrouillon(b);
+  }
+
+  /** Pré-remplit le formulaire à partir d'un modèle (tout reste modifiable). */
+  function appliquerModele(m: ModeleObjectif) {
+    const dureeStandard = m.dureeJours != null && DUREES.includes(m.dureeJours);
+    setBrouillon({
+      ...brouillon,
+      type: m.type,
+      titre: t(cleTitreModele(m)),
+      categorie: m.categorie,
+      unite: m.unite,
+      cible: m.cible != null ? String(m.cible) : '',
+      deja: '',
+      duree: m.dureeJours == null ? null : dureeStandard ? m.dureeJours : DUREE_PERSO,
+      dureePerso: m.dureeJours != null && !dureeStandard ? String(m.dureeJours) : '',
+      jours: m.jours,
+      minutes: m.minutes != null ? String(m.minutes) : '',
+      quantiteSeance: m.quantiteSeance != null ? String(m.quantiteSeance) : '',
+    });
+    setErreurs({});
+    setAfficherModeles(false);
   }
 
   function construireSaisie(): SaisieObjectif | null {
@@ -205,6 +229,11 @@ export default function NouvelObjectif() {
         </>
       }
     >
+      {afficherModeles ? (
+        <ChoixModele moduleSpiritualite={profil?.module_spiritualite ?? false} onChoisir={appliquerModele} />
+      ) : (
+        <Bouton titre={t('form.modeles')} variante="discret" onPress={() => setAfficherModeles(true)} />
+      )}
       <FormulaireObjectif brouillon={brouillon} onChange={changerBrouillon} erreurs={erreurs} moduleSpiritualite={profil?.module_spiritualite ?? false} />
     </Ecran>
   );

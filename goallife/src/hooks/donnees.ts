@@ -1,5 +1,6 @@
 import { useMutation, useMutationState, useQuery, useQueryClient } from '@tanstack/react-query';
 import { actionsEntre, chargerAction, type ActionAvecObjectif, type ChangementStatut } from '@/data/actions';
+import { chargerCandidature, listerCandidatures } from '@/data/candidatures';
 import { cles } from '@/data/cles';
 import { chargerHistorique } from '@/data/historique';
 import { chargerObjectif, listerObjectifs } from '@/data/objectifs';
@@ -53,6 +54,16 @@ export function useAction(id: string) {
 export function useHistorique() {
   const connecte = useConnecte();
   return useQuery({ queryKey: cles.historique, queryFn: () => chargerHistorique(), enabled: connecte });
+}
+
+export function useCandidatures() {
+  const connecte = useConnecte();
+  return useQuery({ queryKey: cles.candidatures, queryFn: listerCandidatures, enabled: connecte });
+}
+
+export function useCandidature(id: string) {
+  const connecte = useConnecte();
+  return useQuery({ queryKey: cles.candidature(id), queryFn: () => chargerCandidature(id), enabled: connecte && Boolean(id) && id !== 'nouvelle' });
 }
 
 /**

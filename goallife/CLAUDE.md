@@ -35,12 +35,13 @@ Lire aussi `AGENTS.md` (règles Expo : vérifier la doc de la version SDK utilis
 - MVP codé : auth e-mail (PKCE), onboarding, objectifs (3 types), plan déterministe + plan IA facultatif, actions
   (faire/reporter/ignorer/annuler), progression, reprise après retard, rappels locaux, coach (règles + IA),
   historique, calendrier, paramètres, export et suppression de compte, offres gratuit/Premium (sans paiement).
-- Vérifié : typecheck, lint, 33 tests Jest, 61 vérifications SQL, 6 tests Deno, bundle Android, démarrage web (Playwright).
+- Modules métier (22/10) : 23 modèles d'objectifs, candidatures (table privée, +1 automatique à l'envoi), estimation de la date d'atteinte, unités verres/heures.
+- Vérifié : typecheck, lint, 62 tests Jest, 75 vérifications SQL, 6 tests Deno, bundle Android, démarrage web (Playwright).
 - JAMAIS testé avec un vrai Supabase, une vraie clé IA, ni sur un vrai téléphone.
 
 ## Prochaines étapes
 1. Créer le projet Supabase, appliquer la migration, remplir `.env`, tester le parcours complet sur un Android.
 2. Choisir le modèle IA (`IA_MODELE`) selon le budget, ajouter la clé, tester le coach.
 3. Paiement : RevenueCat + `react-native-purchases` (voir README §7).
-4. Enrichir les modules métier (budgets, candidatures, routines…) sans toucher au moteur d'objectifs.
+4. Modules restants : budgets mensuels, rappels de médicaments, notification de relance des candidatures.
 5. Connexion Google / téléphone, notifications push serveur, partage familial.
