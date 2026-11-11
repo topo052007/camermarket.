@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
+import { confirmer } from '@/components/dialogues';
 import { useQueryClient } from '@tanstack/react-query';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Alert, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { Bouton } from '@/components/Bouton';
 import { Carte } from '@/components/Carte';
 import { ChampNombre } from '@/components/Champ';
@@ -93,18 +94,19 @@ export default function DetailObjectif() {
   const changerStatut = (statut: StatutObjectif) => executer(() => changerStatutObjectif(objectifId, statut));
 
   function supprimer() {
-    Alert.alert(t('det.supprimer'), t('det.supprimer_confirmer'), [
-      { text: t('commun.annuler'), style: 'cancel' },
-      {
-        text: t('commun.supprimer'),
-        style: 'destructive',
-        onPress: () =>
-          void executer(async () => {
-            await supprimerObjectif(objectifId);
-            router.back();
-          }),
-      },
-    ]);
+    void confirmer({
+      titre: t('det.supprimer'),
+      message: t('det.supprimer_confirmer'),
+      libelleConfirmer: t('commun.supprimer'),
+      libelleAnnuler: t('commun.annuler'),
+      destructif: true,
+    }).then((ok) => {
+      if (ok)
+        void executer(async () => {
+          await supprimerObjectif(objectifId);
+          router.back();
+        });
+    });
   }
 
   const { progression, retard, effort } = calculs;
@@ -149,7 +151,11 @@ export default function DetailObjectif() {
           {progression.mode === 'quantite' && progression.reste > 0 && (
             <Texte variante="petit">{t('det.reste', { reste: quantite(progression.reste, o.unite) })}</Texte>
           )}
-          {effort && <Texte variante="petit">{t('det.effort_restant', { quantite: quantite(effort.parJour, o.unite), nombre: effort.joursRestants })}</Texte>}
+          {effort && (
+            <Texte variante="petit">
+              {t('det.effort_restant', { quantite: quantite(effort.parJour, o.unite), nombre: effort.joursRestants })}
+            </Texte>
+          )}
           {o.type === 'quantitatif' && o.valeur_cible != null && o.statut === 'actif' && (
             <ResumePrevision
               prevision={prevoirAtteinte({ ...o, valeur_cible: o.valeur_cible }, o.evenements_progression, jour)}
@@ -221,7 +227,11 @@ export default function DetailObjectif() {
                   onPress={() => void executer(() => cocherEtape(e.id, !e.terminee_le))}
                   style={{ flexDirection: 'row', alignItems: 'center', gap: espace.s, minHeight: TACTILE_MIN }}
                 >
-                  <Ionicons name={e.terminee_le ? 'checkmark-circle' : 'ellipse-outline'} size={24} color={e.terminee_le ? couleurs.succes : couleurs.primaire} />
+                  <Ionicons
+                    name={e.terminee_le ? 'checkmark-circle' : 'ellipse-outline'}
+                    size={24}
+                    color={e.terminee_le ? couleurs.succes : couleurs.primaire}
+                  />
                   <View style={{ flex: 1 }}>
                     <Texte>{e.titre}</Texte>
                     {e.date_cible && (
@@ -239,11 +249,18 @@ export default function DetailObjectif() {
 
       <Section
         titre={t('det.actions_a_venir')}
-        action={<Bouton titre={t('det.ajouter_action')} variante="discret" compact onPress={() => router.push(`/actions/nouvelle?objectif=${o.id}`)} />}
+        action={
+          <Bouton
+            titre={t('det.ajouter_action')}
+            variante="discret"
+            compact
+            onPress={() => router.push(`/actions/nouvelle?objectif=${o.id}`)}
+          />
+        }
       >
         <Carte>
           {calculs.aVenir.length === 0 ? (
-            <Texte couleur={couleurs.texteSecondaire}>{t('planning.aucune')}</Texte>
+            <Texte couleur={couleurs.texteSecondaire}>{t('det.aucune_a_venir')}</Texte>
           ) : (
             calculs.aVenir.map((a) => (
               <View key={a.id}>
@@ -274,10 +291,23 @@ export default function DetailObjectif() {
 
       <View style={{ gap: espace.s }}>
         <Bouton titre={t('det.modifier')} variante="secondaire" onPress={() => router.push(`/objectifs/${o.id}/modifier`)} />
-        {o.statut === 'actif' && <Bouton titre={t('det.mettre_en_pause')} variante="secondaire" onPress={() => void changerStatut('en_pause')} desactive={occupe} />}
-        {o.statut !== 'actif' && <Bouton titre={t('det.reactiver')} variante="secondaire" onPress={() => void changerStatut('actif')} desactive={occupe} />}
-        {o.statut === 'actif' && <Bouton titre={t('det.marquer_termine')} variante="secondaire" onPress={() => void changerStatut('termine')} desactive={occupe} />}
-        {o.statut === 'actif' && <Bouton titre={t('det.abandonner')} variante="discret" onPress={() => void changerStatut('abandonne')} desactive={occupe} />}
+        {o.statut === 'actif' && (
+          <Bouton
+            titre={t('det.mettre_en_pause')}
+            variante="secondaire"
+            onPress={() => void changerStatut('en_pause')}
+            desactive={occupe}
+          />
+        )}
+        {o.statut !== 'actif' && (
+          <Bouton titre={t('det.reactiver')} variante="secondaire" onPress={() => void changerStatut('actif')} desactive={occupe} />
+        )}
+        {o.statut === 'actif' && (
+          <Bouton titre={t('det.marquer_termine')} variante="secondaire" onPress={() => void changerStatut('termine')} desactive={occupe} />
+        )}
+        {o.statut === 'actif' && (
+          <Bouton titre={t('det.abandonner')} variante="discret" onPress={() => void changerStatut('abandonne')} desactive={occupe} />
+        )}
         <Bouton titre={t('det.supprimer')} variante="danger" onPress={supprimer} desactive={occupe} />
       </View>
     </Ecran>

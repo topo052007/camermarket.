@@ -29,7 +29,7 @@ Lire aussi `AGENTS.md` (règles Expo : vérifier la doc de la version SDK utilis
 ## Commandes
 - `npm run verifier` : typecheck + lint + Jest + tests SQL (`scripts/test-db.sh` lance un PostgreSQL jetable avec `supabase/tests/00-supabase-simule.sql`)
 - Fonctions serveur : `cd supabase/functions && deno check */index.ts && deno test --allow-env _shared/`
-- Bundle : `npx expo export --platform android`
+- Bundle : `npx expo export --platform android` ; web : `npx expo export --platform web` (déploiement Vercel : `vercel.json`, racine `goallife`)
 
 ## État (22/10/2026)
 - MVP codé : auth e-mail (PKCE), onboarding, objectifs (3 types), plan déterministe + plan IA facultatif, actions
@@ -37,6 +37,7 @@ Lire aussi `AGENTS.md` (règles Expo : vérifier la doc de la version SDK utilis
   historique, calendrier, paramètres, export et suppression de compte, offres gratuit/Premium (sans paiement).
 - Modules métier (22/10) : 23 modèles d'objectifs, candidatures (table privée, +1 automatique à l'envoi), estimation de la date d'atteinte, unités verres/heures.
 - Vérifié : typecheck, lint, 62 tests Jest, 75 vérifications SQL, 6 tests Deno, bundle Android, démarrage web (Playwright).
+- Version web (11/11) : confirmations via `src/components/dialogues.ts` (JAMAIS `Alert.alert` direct : il ne fait rien sur le web), export en fichier, colonne centrée ; parcours connecté vérifié dans Chromium avec un faux Supabase.
 - JAMAIS testé avec un vrai Supabase, une vraie clé IA, ni sur un vrai téléphone.
 
 ## Prochaines étapes

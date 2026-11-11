@@ -3,7 +3,7 @@ import { router, Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Bouton } from '@/components/Bouton';
 import { Chargement, EtatErreur } from '@/components/Etats';
@@ -31,7 +31,12 @@ export default function Racine() {
       >
         <FournisseurSession>
           <StatusBar style="dark" />
-          <Navigation />
+          {/* Sur ordinateur (web), l'application reste dans une colonne de la taille d'un téléphone. */}
+          <View style={styles.exterieur}>
+            <View style={styles.cadre}>
+              <Navigation />
+            </View>
+          </View>
         </FournisseurSession>
       </PersistQueryClientProvider>
     </SafeAreaProvider>
@@ -152,7 +157,13 @@ function EcranDemarrage() {
   );
 }
 
+const estWeb = Platform.OS === 'web';
+
 const styles = StyleSheet.create({
+  exterieur: { flex: 1, backgroundColor: estWeb ? couleurs.primaireClair : couleurs.fond },
+  cadre: estWeb
+    ? { flex: 1, width: '100%', maxWidth: 560, alignSelf: 'center', backgroundColor: couleurs.fond, borderLeftWidth: 1, borderRightWidth: 1, borderColor: couleurs.bordure }
+    : { flex: 1 },
   centre: { flex: 1, justifyContent: 'center', padding: espace.xl, gap: espace.l, backgroundColor: couleurs.fond },
   demarrage: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: couleurs.primaire, padding: espace.xl, gap: espace.s },
 });

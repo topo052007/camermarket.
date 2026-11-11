@@ -1,4 +1,4 @@
-import { Alert } from 'react-native';
+import { informer } from '@/components/dialogues';
 import { Bouton } from '@/components/Bouton';
 import { Carte } from '@/components/Carte';
 import { Ecran } from '@/components/Ecran';
@@ -32,7 +32,9 @@ export default function Abonnement() {
           {t('abo.offre_actuelle')}
         </Texte>
         <Texte variante="titre2">{offre === 'premium' ? t('abo.premium') : t('abo.gratuit')}</Texte>
-        {offre === 'premium' && data?.expire_le && <Texte>{t('abo.expire_le', { date: new Date(data.expire_le).toLocaleDateString() })}</Texte>}
+        {offre === 'premium' && data?.expire_le && (
+          <Texte>{t('abo.expire_le', { date: new Date(data.expire_le).toLocaleDateString() })}</Texte>
+        )}
         <Texte variante="petit" couleur={couleurs.texteSecondaire}>
           {t('abo.verifie_serveur')}
         </Texte>
@@ -52,7 +54,7 @@ export default function Abonnement() {
       ))}
       {offre !== 'premium' && (
         <>
-          <Bouton titre={t('abo.passer_premium')} onPress={() => Alert.alert(t('abo.premium'), t('abo.bientot'))} />
+          <Bouton titre={t('abo.passer_premium')} onPress={() => informer(t('abo.premium'), t('abo.bientot'))} />
           <Encart>{t('abo.bientot')}</Encart>
         </>
       )}

@@ -1,7 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query';
+import { confirmer } from '@/components/dialogues';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 import { Bouton } from '@/components/Bouton';
 import { Champ } from '@/components/Champ';
 import { Ecran } from '@/components/Ecran';
@@ -33,7 +34,9 @@ function Formulaire({ candidature, objectifInitial }: { candidature: Candidature
   const [envoi, setEnvoi] = useState(false);
 
   // Seuls les objectifs « carrière » actifs (ou celui déjà lié) peuvent être associés.
-  const objectifsCarriere = (objectifs.data ?? []).filter((o) => o.id === objectifId || (o.categorie === 'carriere' && o.statut === 'actif'));
+  const objectifsCarriere = (objectifs.data ?? []).filter(
+    (o) => o.id === objectifId || (o.categorie === 'carriere' && o.statut === 'actif'),
+  );
   const optionsRelance: { valeur: string | null; libelle: string }[] = [
     { valeur: null, libelle: t('cand.relance_aucune') },
     { valeur: ajouterJours(jour, 7), libelle: t('cand.relance_7') },
@@ -79,18 +82,19 @@ function Formulaire({ candidature, objectifInitial }: { candidature: Candidature
 
   function supprimer() {
     if (!candidature) return;
-    Alert.alert(t('cand.supprimer_confirmer'), '', [
-      { text: t('commun.annuler'), style: 'cancel' },
-      {
-        text: t('commun.supprimer'),
-        style: 'destructive',
-        onPress: () =>
-          void supprimerCandidature(candidature.id)
-            .then(rafraichir)
-            .then(() => router.back())
-            .catch((e) => setErreur(t(cleErreur(e)))),
-      },
-    ]);
+    const id = candidature.id;
+    void confirmer({
+      titre: t('cand.supprimer_confirmer'),
+      libelleConfirmer: t('commun.supprimer'),
+      libelleAnnuler: t('commun.annuler'),
+      destructif: true,
+    }).then((ok) => {
+      if (ok)
+        void supprimerCandidature(id)
+          .then(rafraichir)
+          .then(() => router.back())
+          .catch((e) => setErreur(t(cleErreur(e))));
+    });
   }
 
   return (
@@ -108,7 +112,11 @@ function Formulaire({ candidature, objectifInitial }: { candidature: Candidature
       <Champ libelle={`${t('cand.poste')} (${t('commun.facultatif')})`} value={poste} onChangeText={setPoste} maxLength={120} />
       <View style={{ gap: espace.s }}>
         <Texte variante="libelle">{t('cand.statut')}</Texte>
-        <ChoixUnique options={STATUTS_CANDIDATURE.map((s) => ({ valeur: s, libelle: t(`cand.statut.${s}`) }))} valeur={statut} onChange={setStatut} />
+        <ChoixUnique
+          options={STATUTS_CANDIDATURE.map((s) => ({ valeur: s, libelle: t(`cand.statut.${s}`) }))}
+          valeur={statut}
+          onChange={setStatut}
+        />
       </View>
       <View style={{ gap: espace.s }}>
         <Texte variante="libelle">{t('cand.relance')}</Texte>
@@ -118,7 +126,10 @@ function Formulaire({ candidature, objectifInitial }: { candidature: Candidature
         <View style={{ gap: espace.s }}>
           <Texte variante="libelle">{t('cand.objectif')}</Texte>
           <ChoixUnique
-            options={[{ valeur: null as string | null, libelle: t('cand.aucun_objectif') }, ...objectifsCarriere.map((o) => ({ valeur: o.id as string | null, libelle: o.titre }))]}
+            options={[
+              { valeur: null as string | null, libelle: t('cand.aucun_objectif') },
+              ...objectifsCarriere.map((o) => ({ valeur: o.id as string | null, libelle: o.titre })),
+            ]}
             valeur={objectifId}
             onChange={setObjectifId}
           />
@@ -147,6 +158,7 @@ export default function EcranCandidature() {
   const requete = useCandidature(id);
   if (nouvelle) return <Formulaire candidature={null} objectifInitial={objectif ?? null} />;
   if (requete.isLoading) return <Chargement />;
-  if (!requete.data) return <EtatVide titre={t('erreur.introuvable')} action={{ titre: t('commun.retour'), onPress: () => router.back() }} />;
+  if (!requete.data)
+    return <EtatVide titre={t('erreur.introuvable')} action={{ titre: t('commun.retour'), onPress: () => router.back() }} />;
   return <Formulaire candidature={requete.data} objectifInitial={null} />;
 }

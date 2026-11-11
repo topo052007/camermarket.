@@ -130,6 +130,37 @@ npx expo start              # scanner le QR code avec le téléphone
    ```
    Prévoir deux projets Supabase (développement et production) dès que de vrais utilisateurs arrivent.
 
+## 5 bis. Version site web
+
+La même application fonctionne dans un navigateur (ordinateur ou téléphone), sans rien installer.
+Sur un grand écran, elle s'affiche dans une colonne centrée de la taille d'un téléphone.
+
+<p>
+<img src="docs/captures/web-accueil.png" width="380" alt="Accueil web">
+<img src="docs/captures/web-plan.png" width="380" alt="Plan d'action web">
+</p>
+
+**Essayer sur ton ordinateur :** `npx expo start --web` (avec le `.env` rempli).
+
+**Mettre en ligne sur Vercel (gratuit)** — demande ton compte Vercel et le projet Supabase :
+1. Sur vercel.com : *Add New > Project*, choisir le dépôt GitHub et la branche.
+2. *Root Directory* : `goallife`. Le reste est lu dans `goallife/vercel.json`
+   (construction `npx expo export --platform web`, dossier `dist`).
+3. *Environment Variables* : `EXPO_PUBLIC_SUPABASE_URL` et `EXPO_PUBLIC_SUPABASE_KEY` (clé publique).
+4. Après le premier déploiement, dans Supabase *Authentication > URL Configuration* : mettre
+   l'adresse Vercel (`https://….vercel.app`) dans *Site URL* et ajouter `https://….vercel.app/**`
+   dans *Redirect URLs* (pour les liens « mot de passe oublié »).
+
+Différences avec l'application mobile :
+- **Pas de rappels** sur le web (l'écran Notifications l'indique).
+- Les confirmations (supprimer, se déconnecter) utilisent les fenêtres du navigateur.
+- L'export des données télécharge un fichier `.json`.
+- Le mode hors connexion garde les données récentes dans le navigateur.
+
+Vérifié le 11/11/2026 dans Chromium, avec un faux serveur Supabase : connexion, tableau de bord,
+création d'un objectif depuis un modèle, plan, activation, suppression (annuler puis confirmer),
+export, déconnexion — aucune erreur JavaScript. **Pas encore testé avec un vrai Supabase.**
+
 ## 6. Coach IA
 
 - Sans `ANTHROPIC_API_KEY`, tout fonctionne : l'écran « Mon Coach » affiche honnêtement que l'IA
@@ -212,5 +243,5 @@ des données Google Play, notifications push : clés FCM (Android) et APNs (iOS)
   rappel automatique de relance des candidatures (aujourd'hui : simple badge « À relancer »),
   partage familial.
 - Pas de limitation de débit spécifique sur l'inscription/connexion au-delà de celle de Supabase Auth.
-- La version web sert aux tests ; les rappels n'y sont pas disponibles.
+- Version web : pas de rappels (navigateur).
 - Export des données : JSON partagé via la feuille de partage du téléphone (pas de fichier).

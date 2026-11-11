@@ -1,7 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query';
+import { confirmer, informer } from '@/components/dialogues';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 import { Bouton } from '@/components/Bouton';
 import { Carte } from '@/components/Carte';
 import { Champ, ChampNombre } from '@/components/Champ';
@@ -81,8 +82,18 @@ function FormulaireAction({ objectifId, action }: { objectifId: string; action: 
       <Champ libelle={t('act.titre')} value={edition.titre} onChangeText={(v) => setEdition({ ...edition, titre: v })} maxLength={160} />
       <Texte variante="libelle">{t('act.date')}</Texte>
       <ChoixUnique options={options} valeur={edition.decalage} onChange={(v) => setEdition({ ...edition, decalage: v })} />
-      <ChampNombre libelle={`${t('act.quantite')} (${t('commun.facultatif')})`} valeur={edition.quantite} onValide={(n) => setEdition({ ...edition, quantite: n })} />
-      <ChampNombre libelle={`${t('act.minutes')} (${t('commun.facultatif')})`} valeur={edition.minutes} entier max={600} onValide={(n) => setEdition({ ...edition, minutes: n })} />
+      <ChampNombre
+        libelle={`${t('act.quantite')} (${t('commun.facultatif')})`}
+        valeur={edition.quantite}
+        onValide={(n) => setEdition({ ...edition, quantite: n })}
+      />
+      <ChampNombre
+        libelle={`${t('act.minutes')} (${t('commun.facultatif')})`}
+        valeur={edition.minutes}
+        entier
+        max={600}
+        onValide={(n) => setEdition({ ...edition, minutes: n })}
+      />
       {erreur && <Encart ton="danger">{erreur}</Encart>}
       <Bouton titre={t('commun.enregistrer')} onPress={enregistrer} chargement={envoi} />
     </View>
@@ -91,7 +102,10 @@ function FormulaireAction({ objectifId, action }: { objectifId: string; action: 
 
 function libelleHistorique(l: LigneHistoriqueAction, t: ReturnType<typeof useI18n>['t']): string {
   const statut = t(`statut_action.${l.nouveau_statut as StatutAction}`);
-  const raison = typeof l.details.raison === 'string' ? ` · ${t('act.raison', { raison: l.details.raison === 'reprise' ? t('act.raison_reprise') : l.details.raison })}` : '';
+  const raison =
+    typeof l.details.raison === 'string'
+      ? ` · ${t('act.raison', { raison: l.details.raison === 'reprise' ? t('act.raison_reprise') : l.details.raison })}`
+      : '';
   return `${statut}${raison}`;
 }
 
@@ -131,18 +145,18 @@ export default function EcranAction() {
   }
 
   function supprimer() {
-    Alert.alert(t('act.supprimer_confirmer'), '', [
-      { text: t('commun.annuler'), style: 'cancel' },
-      {
-        text: t('commun.supprimer'),
-        style: 'destructive',
-        onPress: () =>
-          void supprimerAction(action!.id)
-            .then(() => client.invalidateQueries({ queryKey: cles.actions }))
-            .then(() => router.back())
-            .catch((e) => Alert.alert(t(cleErreur(e)))),
-      },
-    ]);
+    void confirmer({
+      titre: t('act.supprimer_confirmer'),
+      libelleConfirmer: t('commun.supprimer'),
+      libelleAnnuler: t('commun.annuler'),
+      destructif: true,
+    }).then((ok) => {
+      if (ok)
+        void supprimerAction(action!.id)
+          .then(() => client.invalidateQueries({ queryKey: cles.actions }))
+          .then(() => router.back())
+          .catch((e) => informer(t(cleErreur(e))));
+    });
   }
 
   return (
@@ -169,13 +183,27 @@ export default function EcranAction() {
           {action.statut !== 'terminee' ? (
             <>
               {action.quantite_prevue != null && (
-                <ChampNombre libelle={t('act.quantite_realisee')} valeur={action.quantite_prevue} onValide={setQuantiteFaite} aide={quantite(quantiteFaite ?? action.quantite_prevue, unite)} />
+                <ChampNombre
+                  libelle={t('act.quantite_realisee')}
+                  valeur={action.quantite_prevue}
+                  onValide={setQuantiteFaite}
+                  aide={quantite(quantiteFaite ?? action.quantite_prevue, unite)}
+                />
               )}
-              <Bouton titre={t('act.terminer')} onPress={() => changerStatut('terminee', { quantite: quantiteFaite ?? action.quantite_prevue })} />
-              {action.statut === 'a_faire' && <Bouton titre={t('act.reporter')} variante="secondaire" onPress={() => setMode('reporter')} />}
+              <Bouton
+                titre={t('act.terminer')}
+                onPress={() => changerStatut('terminee', { quantite: quantiteFaite ?? action.quantite_prevue })}
+              />
+              {action.statut === 'a_faire' && (
+                <Bouton titre={t('act.reporter')} variante="secondaire" onPress={() => setMode('reporter')} />
+              )}
               {action.statut === 'a_faire' && <Bouton titre={t('act.ignorer')} variante="secondaire" onPress={() => setMode('ignorer')} />}
-              {action.statut !== 'a_faire' && <Bouton titre={t('act.retablir')} variante="secondaire" onPress={() => changerStatut('a_faire')} />}
-              {action.statut === 'a_faire' && <Bouton titre={t('act.annuler_action')} variante="discret" onPress={() => changerStatut('annulee')} />}
+              {action.statut !== 'a_faire' && (
+                <Bouton titre={t('act.retablir')} variante="secondaire" onPress={() => changerStatut('a_faire')} />
+              )}
+              {action.statut === 'a_faire' && (
+                <Bouton titre={t('act.annuler_action')} variante="discret" onPress={() => changerStatut('annulee')} />
+              )}
             </>
           ) : (
             <Bouton titre={t('act.retablir')} variante="secondaire" onPress={() => changerStatut('a_faire')} />

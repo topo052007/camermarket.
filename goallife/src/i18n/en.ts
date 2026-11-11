@@ -273,6 +273,7 @@ export const en: Record<keyof typeof fr, string> = {
   'det.pas_de_mesure': 'No data yet: progress will appear after your first actions.',
   'det.etapes': 'Steps',
   'det.actions_a_venir': 'Upcoming',
+  'det.aucune_a_venir': 'No actions in the next 7 days.',
   'det.actions_passees': 'Recent',
   'det.ajouter_contribution': 'Add an amount',
   'det.contribution_quantite': 'Quantity to add',

@@ -284,6 +284,7 @@ export const fr = {
   'det.pas_de_mesure': 'Pas encore de données : la progression apparaîtra après tes premières actions.',
   'det.etapes': 'Étapes',
   'det.actions_a_venir': 'À venir',
+  'det.aucune_a_venir': 'Aucune action dans les 7 prochains jours.',
   'det.actions_passees': 'Récemment',
   'det.ajouter_contribution': 'Ajouter un montant',
   'det.contribution_quantite': 'Quantité à ajouter',

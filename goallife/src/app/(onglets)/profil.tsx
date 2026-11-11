@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Alert } from 'react-native';
+import { confirmer } from '@/components/dialogues';
 import { Carte } from '@/components/Carte';
 import { Ecran } from '@/components/Ecran';
 import { LigneLien } from '@/components/Lignes';
@@ -17,10 +17,15 @@ export default function Profil() {
   const { offre } = useAbonnement();
 
   function deconnecter() {
-    Alert.alert(t('profil.deconnexion'), t('profil.deconnexion_confirmer'), [
-      { text: t('commun.annuler'), style: 'cancel' },
-      { text: t('profil.deconnexion'), style: 'destructive', onPress: () => void supabase.auth.signOut() },
-    ]);
+    void confirmer({
+      titre: t('profil.deconnexion'),
+      message: t('profil.deconnexion_confirmer'),
+      libelleConfirmer: t('profil.deconnexion'),
+      libelleAnnuler: t('commun.annuler'),
+      destructif: true,
+    }).then((ok) => {
+      if (ok) void supabase.auth.signOut();
+    });
   }
 
   return (

@@ -1,7 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { informer } from '@/components/dialogues';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 import { Bouton } from '@/components/Bouton';
 import { Ecran } from '@/components/Ecran';
 import { Encart } from '@/components/Etats';
@@ -156,7 +157,14 @@ export default function NouvelObjectif() {
     try {
       const r = await demanderPlanIa(saisie, langue);
       if (r.ok) setPlan(r.plan);
-      else setErreur(r.raison === 'quota_epuise' ? t('coach.quota_epuise') : r.raison === 'non_configuree' ? t('plan.ia_non_configuree') : t('coach.erreur'));
+      else
+        setErreur(
+          r.raison === 'quota_epuise'
+            ? t('coach.quota_epuise')
+            : r.raison === 'non_configuree'
+              ? t('plan.ia_non_configuree')
+              : t('coach.erreur'),
+        );
     } catch {
       setErreur(t('coach.erreur'));
     } finally {
@@ -171,11 +179,8 @@ export default function NouvelObjectif() {
     setErreur(null);
     try {
       const id = await creerObjectifAvecPlan(saisie, plan, ajouterJours(aujourdhui(), HORIZON_JOURS));
-      await Promise.all([
-        client.invalidateQueries({ queryKey: cles.objectifs }),
-        client.invalidateQueries({ queryKey: cles.actions }),
-      ]);
-      Alert.alert(t('plan.cree'));
+      await Promise.all([client.invalidateQueries({ queryKey: cles.objectifs }), client.invalidateQueries({ queryKey: cles.actions })]);
+      informer(t('plan.cree'));
       router.replace(`/objectifs/${id}`);
     } catch (e) {
       setErreur(t(cleErreur(e)));
@@ -190,7 +195,12 @@ export default function NouvelObjectif() {
         bas={
           <>
             {erreur && <Encart ton="danger">{erreur}</Encart>}
-            <Bouton titre={t('plan.activer')} onPress={activer} chargement={envoi} desactive={plan.recurrences.some((r) => r.joursSemaine.length === 0)} />
+            <Bouton
+              titre={t('plan.activer')}
+              onPress={activer}
+              chargement={envoi}
+              desactive={plan.recurrences.some((r) => r.joursSemaine.length === 0)}
+            />
             <Bouton titre={t('commun.modifier')} variante="discret" onPress={() => setPlan(null)} />
           </>
         }
@@ -202,7 +212,12 @@ export default function NouvelObjectif() {
             <Bouton titre={t('plan.revenir_regles')} variante="secondaire" onPress={() => setPlan(planRegles)} />
           ) : (
             <View>
-              <Bouton titre={chargementIa ? t('plan.ia_en_cours') : t('plan.proposer_ia')} variante="secondaire" onPress={proposerIa} chargement={chargementIa} />
+              <Bouton
+                titre={chargementIa ? t('plan.ia_en_cours') : t('plan.proposer_ia')}
+                variante="secondaire"
+                onPress={proposerIa}
+                chargement={chargementIa}
+              />
             </View>
           )
         ) : (
@@ -234,7 +249,12 @@ export default function NouvelObjectif() {
       ) : (
         <Bouton titre={t('form.modeles')} variante="discret" onPress={() => setAfficherModeles(true)} />
       )}
-      <FormulaireObjectif brouillon={brouillon} onChange={changerBrouillon} erreurs={erreurs} moduleSpiritualite={profil?.module_spiritualite ?? false} />
+      <FormulaireObjectif
+        brouillon={brouillon}
+        onChange={changerBrouillon}
+        erreurs={erreurs}
+        moduleSpiritualite={profil?.module_spiritualite ?? false}
+      />
     </Ecran>
   );
 }

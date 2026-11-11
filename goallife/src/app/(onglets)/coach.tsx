@@ -1,6 +1,7 @@
 import { onlineManager, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { confirmer } from '@/components/dialogues';
 import { useMemo, useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Bouton } from '@/components/Bouton';
 import { Carte } from '@/components/Carte';
 import { Champ } from '@/components/Champ';
@@ -58,14 +59,14 @@ export default function Coach() {
   });
 
   function effacer() {
-    Alert.alert(t('coach.effacer_historique'), '', [
-      { text: t('commun.annuler'), style: 'cancel' },
-      {
-        text: t('commun.supprimer'),
-        style: 'destructive',
-        onPress: () => void effacerMessagesCoach(userId).then(() => client.invalidateQueries({ queryKey: cles.messagesCoach })),
-      },
-    ]);
+    void confirmer({
+      titre: t('coach.effacer_historique'),
+      libelleConfirmer: t('commun.supprimer'),
+      libelleAnnuler: t('commun.annuler'),
+      destructif: true,
+    }).then((ok) => {
+      if (ok) void effacerMessagesCoach(userId).then(() => client.invalidateQueries({ queryKey: cles.messagesCoach }));
+    });
   }
 
   const quotaEpuise = statut.data != null && statut.data.utilise >= statut.data.quota;

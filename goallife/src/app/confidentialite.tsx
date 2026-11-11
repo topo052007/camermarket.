@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Share } from 'react-native';
+import { Platform, Share } from 'react-native';
 import { Bouton } from '@/components/Bouton';
 import { Champ } from '@/components/Champ';
 import { Ecran } from '@/components/Ecran';
@@ -30,7 +30,18 @@ export default function Confidentialite() {
     setErreur(null);
     try {
       const donnees = await exporterDonnees();
-      await Share.share({ title: t('conf.export_titre', { app: NOM_APP }), message: JSON.stringify(donnees, null, 2) });
+      const texte = JSON.stringify(donnees, null, 2);
+      if (Platform.OS === 'web') {
+        // Navigateur : téléchargement d'un fichier .json (la feuille de partage n'existe pas partout).
+        const url = URL.createObjectURL(new Blob([texte], { type: 'application/json' }));
+        const lien = document.createElement('a');
+        lien.href = url;
+        lien.download = `${NOM_APP.toLowerCase()}-donnees-${new Date().toISOString().slice(0, 10)}.json`;
+        lien.click();
+        URL.revokeObjectURL(url);
+      } else {
+        await Share.share({ title: t('conf.export_titre', { app: NOM_APP }), message: texte });
+      }
     } catch (e) {
       setErreur(t(cleErreur(e)));
     } finally {
