@@ -44,6 +44,7 @@ Lire aussi `AGENTS.md` (règles Expo : vérifier la doc de la version SDK utilis
   Vérifié sur la vraie base (transaction annulée) : inscription -> profil, plan -> 15 actions, double validation = 1 contribution,
   statut non modifiable directement, limite gratuite, isolation entre deux utilisateurs.
   Restent dans le projet deux anciennes fonctions cassées à supprimer à la main : `delete-account` et `billing-webhook`.
+- Web en ligne (11/11) : https://goallife.vercel.app (Vercel, projet `goallife` prj_01ptyZ9ooLbBARqonU6GJfERlbnB, équipe topo10, racine `goallife`, Node 22). Les pushs sur `main` déploient en production ; les autres branches créent des aperçus.
 - JAMAIS testé : l'application elle-même contre le vrai Supabase (réseau de l'environnement cloud fermé), une vraie clé IA, un vrai téléphone.
 
 ## Prochaines étapes

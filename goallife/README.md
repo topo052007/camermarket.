@@ -137,6 +137,10 @@ npx expo start              # scanner le QR code avec le téléphone
 
 ## 5 bis. Version site web
 
+**En ligne : https://goallife.vercel.app** (projet Vercel `goallife`, équipe `topo10`, dossier racine `goallife`,
+Node 22, variables `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_KEY` déjà configurées). Publié le 11/11/2026
+depuis la branche `claude/epic-franklin-asrzgm` ; vérifié accessible publiquement.
+
 La même application fonctionne dans un navigateur (ordinateur ou téléphone), sans rien installer.
 Sur un grand écran, elle s'affiche dans une colonne centrée de la taille d'un téléphone.
 
