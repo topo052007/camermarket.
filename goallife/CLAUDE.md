@@ -38,7 +38,13 @@ Lire aussi `AGENTS.md` (règles Expo : vérifier la doc de la version SDK utilis
 - Modules métier (22/10) : 23 modèles d'objectifs, candidatures (table privée, +1 automatique à l'envoi), estimation de la date d'atteinte, unités verres/heures.
 - Vérifié : typecheck, lint, 62 tests Jest, 75 vérifications SQL, 6 tests Deno, bundle Android, démarrage web (Playwright).
 - Version web (11/11) : confirmations via `src/components/dialogues.ts` (JAMAIS `Alert.alert` direct : il ne fait rien sur le web), export en fichier, colonne centrée ; parcours connecté vérifié dans Chromium avec un faux Supabase.
-- JAMAIS testé avec un vrai Supabase, une vraie clé IA, ni sur un vrai téléphone.
+- Supabase (11/11) : projet `kucjmigkztqgbnqhjvil` (organisation du propriétaire, offre gratuite, eu-west-1).
+  L'ancien schéma d'objectifs en anglais (tables vides) a été supprimé à la demande du propriétaire ; les 3 migrations
+  de `supabase/migrations/` y sont appliquées ; fonctions `coach`, `supprimer-compte`, `webhook-abonnement` déployées.
+  Vérifié sur la vraie base (transaction annulée) : inscription -> profil, plan -> 15 actions, double validation = 1 contribution,
+  statut non modifiable directement, limite gratuite, isolation entre deux utilisateurs.
+  Restent dans le projet deux anciennes fonctions cassées à supprimer à la main : `delete-account` et `billing-webhook`.
+- JAMAIS testé : l'application elle-même contre le vrai Supabase (réseau de l'environnement cloud fermé), une vraie clé IA, un vrai téléphone.
 
 ## Prochaines étapes
 1. Créer le projet Supabase, appliquer la migration, remplir `.env`, tester le parcours complet sur un Android.

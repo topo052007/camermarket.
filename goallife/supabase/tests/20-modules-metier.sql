@@ -61,4 +61,14 @@ select tst.ok(not exists (select 1 from public.candidatures where entreprise = '
 delete from auth.users where id = :carine;
 select tst.ok(not exists (select 1 from public.candidatures where user_id = :carine), 'candidatures supprimées avec le compte');
 
+-- Droits des fonctions : un visiteur non connecté ne peut appeler aucune fonction de l'application
+set role anon;
+select tst.echoue('select public.changer_statut_action(gen_random_uuid(), ''terminee'')', 'permission denied', 'anonyme : changer_statut_action interdit');
+select tst.echoue('select public.reprendre_objectif(gen_random_uuid(), ''action_minimale'')', 'permission denied', 'anonyme : reprendre_objectif interdit');
+select tst.echoue('select public.creer_objectif_avec_plan(''{}'', ''[]'', ''[]'', current_date)', 'permission denied', 'anonyme : creer_objectif_avec_plan interdit');
+reset role;
+set role authenticated;
+select tst.echoue('select public.verifier_limite_objectifs()', 'permission denied', 'fonction de trigger non appelable');
+reset role;
+
 \echo '   tests des modules métier passés'

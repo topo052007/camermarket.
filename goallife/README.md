@@ -108,11 +108,16 @@ npx expo start              # scanner le QR code avec le téléphone
 > développement** : `npx eas-cli@latest build --profile development --platform android`
 > (installe un APK sur le téléphone, puis `npx expo start`).
 
-## 5. Configurer Supabase (à faire par toi)
+## 5. Configurer Supabase
+
+> **Déjà fait le 11/11/2026** sur le projet `kucjmigkztqgbnqhjvil` : les 3 migrations sont appliquées et les
+> 3 fonctions serveur déployées. Il reste seulement les étapes 3 et 4 ci-dessous (réglages Auth, `.env`),
+> et à supprimer dans *Edge Functions* deux anciennes fonctions inutilisées : `delete-account` et `billing-webhook`.
+> Les étapes complètes restent utiles pour créer un projet de production séparé.
 
 1. Créer un projet sur supabase.com (région proche : `eu-west` ou `eu-central`).
 2. **SQL Editor** : exécuter, dans l'ordre, les fichiers de `supabase/migrations/`
-   (`20261022000001_schema_initial.sql` puis `20261022000002_modules_metier.sql`).
+   (`20261022000001_schema_initial.sql`, `20261022000002_modules_metier.sql`, `20261111000001_droits_fonctions.sql`).
    (Ou avec la CLI : `npx supabase link` puis `npx supabase db push`.)
 3. **Authentication > URL Configuration** : ajouter `goallife://**` dans *Redirect URLs*
    (et l'adresse `exp://…` affichée par Expo Go pendant les tests).
