@@ -1,0 +1,55 @@
+# GoalLife (nom provisoire)
+
+Application mobile de réalisation d'objectifs personnels, pensée d'abord pour le Cameroun puis l'Afrique.
+Propriétaire débutant en programmation : **répondre en français, expliquer simplement**.
+Projet indépendant de la boutique CamerMarket (dossier parent) : ne pas mélanger les deux.
+Lire aussi `AGENTS.md` (règles Expo : vérifier la doc de la version SDK utilisée, `npx expo install`).
+
+## Stack
+- Expo SDK 58, React Native 0.88, React 19, TypeScript strict, Expo Router (`src/app/`)
+- Supabase : Auth, PostgreSQL + RLS, Edge Functions (Deno) ; client avec la clé PUBLIQUE uniquement
+- TanStack Query (cache persistant AsyncStorage, file d'attente hors ligne), zod
+- expo-notifications (rappels LOCAUX), expo-localization
+- IA : Edge Function `coach`, SDK `@anthropic-ai/sdk`, fournisseur remplaçable (`_shared/ia/`)
+
+## Choix à respecter
+- Noms de fichiers, variables, tables en français (comme le code existant).
+- Aucun texte visible en dur : tout passe par `src/i18n/fr.ts` (référence) et `en.ts` (TypeScript vérifie que les clés existent).
+- Logique métier PURE dans `src/domain/` (testée par Jest) ; accès serveur uniquement dans `src/data/`.
+- Sécurité côté serveur : RLS sur toutes les tables, clés étrangères composites `(objectif_id, user_id)`,
+  le statut d'une action ne change que par la fonction `changer_statut_action`,
+  Premium écrit uniquement par `webhook-abonnement`, quotas IA par `consommer_quota_ia`.
+- Toute fonction SQL `security definer` a `set search_path = public` et vérifie `auth.uid()`.
+- Limites des offres : la table `parametres_offres` fait foi ; `src/domain/offres.ts` en est une copie d'affichage (garder les deux alignées).
+- Ne jamais inventer de progression, de réponse IA ou de paiement. Sans clé IA, le dire honnêtement.
+- Ne jamais culpabiliser l'utilisateur (textes de retard et de reprise bienveillants).
+- Spiritualité : module facultatif, jamais présumé ; catégories `spiritualite` et `sante` discrètes dans les notifications.
+- Règles de calcul documentées dans `docs/progression-et-plans.md` (à mettre à jour si elles changent).
+
+## Commandes
+- `npm run verifier` : typecheck + lint + Jest + tests SQL (`scripts/test-db.sh` lance un PostgreSQL jetable avec `supabase/tests/00-supabase-simule.sql`)
+- Fonctions serveur : `cd supabase/functions && deno check */index.ts && deno test --allow-env _shared/`
+- Bundle : `npx expo export --platform android` ; web : `npx expo export --platform web` (déploiement Vercel : `vercel.json`, racine `goallife`)
+
+## État (22/10/2026)
+- MVP codé : auth e-mail (PKCE), onboarding, objectifs (3 types), plan déterministe + plan IA facultatif, actions
+  (faire/reporter/ignorer/annuler), progression, reprise après retard, rappels locaux, coach (règles + IA),
+  historique, calendrier, paramètres, export et suppression de compte, offres gratuit/Premium (sans paiement).
+- Modules métier (22/10) : 23 modèles d'objectifs, candidatures (table privée, +1 automatique à l'envoi), estimation de la date d'atteinte, unités verres/heures.
+- Vérifié : typecheck, lint, 62 tests Jest, 75 vérifications SQL, 6 tests Deno, bundle Android, démarrage web (Playwright).
+- Version web (11/11) : confirmations via `src/components/dialogues.ts` (JAMAIS `Alert.alert` direct : il ne fait rien sur le web), export en fichier, colonne centrée ; parcours connecté vérifié dans Chromium avec un faux Supabase.
+- Supabase (11/11) : projet `kucjmigkztqgbnqhjvil` (organisation du propriétaire, offre gratuite, eu-west-1).
+  L'ancien schéma d'objectifs en anglais (tables vides) a été supprimé à la demande du propriétaire ; les 3 migrations
+  de `supabase/migrations/` y sont appliquées ; fonctions `coach`, `supprimer-compte`, `webhook-abonnement` déployées.
+  Vérifié sur la vraie base (transaction annulée) : inscription -> profil, plan -> 15 actions, double validation = 1 contribution,
+  statut non modifiable directement, limite gratuite, isolation entre deux utilisateurs.
+  Restent dans le projet deux anciennes fonctions cassées à supprimer à la main : `delete-account` et `billing-webhook`.
+- Web en ligne (11/11) : https://goallife.vercel.app (Vercel, projet `goallife` prj_01ptyZ9ooLbBARqonU6GJfERlbnB, équipe topo10, racine `goallife`, Node 22). Les pushs sur `main` déploient en production ; les autres branches créent des aperçus.
+- JAMAIS testé : l'application elle-même contre le vrai Supabase (réseau de l'environnement cloud fermé), une vraie clé IA, un vrai téléphone.
+
+## Prochaines étapes
+1. Créer le projet Supabase, appliquer la migration, remplir `.env`, tester le parcours complet sur un Android.
+2. Choisir le modèle IA (`IA_MODELE`) selon le budget, ajouter la clé, tester le coach.
+3. Paiement : RevenueCat + `react-native-purchases` (voir README §7).
+4. Modules restants : budgets mensuels, rappels de médicaments, notification de relance des candidatures.
+5. Connexion Google / téléphone, notifications push serveur, partage familial.
