@@ -1,8 +1,9 @@
+import { onlineManager } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { router, Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Bouton } from '@/components/Bouton';
@@ -11,6 +12,7 @@ import { Texte } from '@/components/Texte';
 import { configurationComplete, NOM_APP } from '@/config/env';
 import { useProfil } from '@/hooks/donnees';
 import { useSynchroArrierePlan } from '@/hooks/synchro';
+import { prendreEcranApresOnboarding } from '@/navigation/apres-onboarding';
 import { configurerNotifications } from '@/notifications';
 import { clientRequetes, persisteur } from '@/offline/client-requetes';
 import { useI18n } from '@/providers/I18n';
@@ -50,14 +52,44 @@ const ROUTES_PUBLIQUES = new Set(['(auth)', 'auth-retour', 'reinitialiser', 'con
  * Les gardes Stack.Protected empêchent d'afficher un écran interdit ; ce composant envoie en plus
  * l'utilisateur au bon endroit au démarrage (sinon l'adresse « / » mène à « introuvable »).
  */
-function Redirection({ connecte, onboardingFini }: { connecte: boolean; onboardingFini: boolean }) {
+// Dernière connexion déjà traitée (au niveau du module : survit au remontage de la navigation).
+let derniereConnexionTraitee = 0;
+
+/**
+ * Les gardes Stack.Protected empêchent d'afficher un écran interdit ; ce composant envoie en plus
+ * l'utilisateur au bon endroit :
+ * - non connecté : vers la connexion (sauf pages publiques : aide, confidentialité, liens e-mail) ;
+ * - connecté sans onboarding : toujours vers l'onboarding (sinon on peut rester bloqué sur « Aide ») ;
+ * - juste après une connexion : vers l'onboarding ou le tableau de bord, où qu'on soit.
+ */
+function Redirection({ connecte, onboardingFini, connexions }: { connecte: boolean; onboardingFini: boolean; connexions: number }) {
   const segments = useSegments();
   const premier = segments[0] ?? '';
   useEffect(() => {
-    if (!connecte && !ROUTES_PUBLIQUES.has(premier)) router.replace('/connexion');
-    else if (connecte && !onboardingFini && premier !== 'onboarding' && !ROUTES_PUBLIQUES.has(premier)) router.replace('/onboarding');
-    else if (connecte && onboardingFini && (premier === '(auth)' || premier === 'onboarding')) router.replace('/');
-  }, [connecte, onboardingFini, premier]);
+    if (!connecte) {
+      if (!ROUTES_PUBLIQUES.has(premier)) router.replace('/connexion');
+      return;
+    }
+    const liensEmail = premier === 'auth-retour' || premier === 'reinitialiser';
+    if (!onboardingFini) {
+      if (premier !== 'onboarding' && !liensEmail) router.replace('/onboarding');
+      return;
+    }
+    const vientDeSeConnecter = connexions !== derniereConnexionTraitee;
+    derniereConnexionTraitee = connexions;
+    if (premier === 'onboarding') {
+      // L'écran d'onboarding vient de disparaître (gardes) : on rejoint l'accueil d'abord ;
+      // l'écran demandé à la fin de l'onboarding est ouvert au passage suivant, une fois l'accueil affiché.
+      router.replace('/');
+      return;
+    }
+    const suite = prendreEcranApresOnboarding();
+    if (suite && suite !== '/') {
+      router.replace(suite);
+    } else if (premier === '(auth)' || (vientDeSeConnecter && !liensEmail && ROUTES_PUBLIQUES.has(premier))) {
+      router.replace('/');
+    }
+  }, [connecte, onboardingFini, connexions, premier]);
   return null;
 }
 
@@ -68,9 +100,26 @@ function SynchroArrierePlan() {
 
 function Navigation() {
   const { t } = useI18n();
-  const { session, chargement } = useSession();
+  const { session, chargement, connexions } = useSession();
   const profil = useProfil();
-  const pret = !chargement && (!session || profil.data != null || profil.isError);
+  // Au début de chaque session, le profil est relu UNE fois auprès du serveur : une copie locale ancienne
+  // (« onboarding pas fini ») ferait sinon réapparaître l'onboarding. Hors connexion, on garde la copie.
+  const [profilVerifiePour, setProfilVerifiePour] = useState<string | null>(null);
+  const userId = session?.user.id ?? null;
+  const { refetch: relireProfil } = profil;
+  useEffect(() => {
+    if (!userId) return;
+    let actif = true;
+    void relireProfil().finally(() => {
+      if (actif) setProfilVerifiePour(userId);
+    });
+    return () => {
+      actif = false;
+    };
+  }, [userId, relireProfil]);
+  const verificationEnCours =
+    userId != null && profilVerifiePour !== userId && onlineManager.isOnline() && profil.data != null && !profil.data.onboarding_termine_le;
+  const pret = !chargement && (!session || profil.data != null || profil.isError) && !verificationEnCours;
 
   useEffect(() => {
     if (pret || !configurationComplete) void SplashScreen.hideAsync().catch(() => undefined);
@@ -108,7 +157,7 @@ function Navigation() {
   return (
     <>
       {connecte && onboardingFini && <SynchroArrierePlan />}
-      <Redirection connecte={connecte} onboardingFini={onboardingFini} />
+      <Redirection connecte={connecte} onboardingFini={onboardingFini} connexions={connexions} />
       <Stack screenOptions={entete}>
         <Stack.Protected guard={!connecte}>
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />

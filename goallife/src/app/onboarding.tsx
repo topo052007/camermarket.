@@ -1,5 +1,4 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { Bouton } from '@/components/Bouton';
@@ -11,6 +10,7 @@ import { SelecteurHeure } from '@/components/Selecteurs';
 import { Texte } from '@/components/Texte';
 import { NOM_APP } from '@/config/env';
 import { cles } from '@/data/cles';
+import { choisirEcranApresOnboarding } from '@/navigation/apres-onboarding';
 import { cleErreur } from '@/data/erreurs';
 import { majPrefsNotifications, majProfil } from '@/data/profil';
 import { CATEGORIES, type CodeCategorie, type Devise, type Langue } from '@/domain/types';
@@ -55,10 +55,10 @@ export default function Onboarding() {
         module_spiritualite: domaines.includes('spiritualite'),
         onboarding_termine_le: new Date().toISOString(),
       });
-      await client.invalidateQueries({ queryKey: cles.profil });
+      // La navigation suit dès que le profil rechargé indique l'onboarding terminé (app/_layout.tsx).
+      choisirEcranApresOnboarding(versCreation ? '/objectifs/nouveau' : '/');
       await client.invalidateQueries({ queryKey: cles.prefsNotifications });
-      if (versCreation) router.replace('/objectifs/nouveau');
-      else router.replace('/');
+      await client.invalidateQueries({ queryKey: cles.profil });
     } catch (e) {
       setErreur(t(cleErreur(e)));
     } finally {
